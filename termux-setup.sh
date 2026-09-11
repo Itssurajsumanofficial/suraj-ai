@@ -66,13 +66,13 @@ info "Running in Termux ${TERMUX_VERSION:-} on $(uname -m)"
 echo ""
 echo -e "${C}[1/4] Installing system packages…${B}"
 pkg update -y >/dev/null 2>&1 || true
-pkg install -y python python-pip android-tools git >/dev/null 2>&1 || {
-  warn "Bulk install had issues, trying packages one by one…"
-  pkg install -y python        || err "python install failed"
-  pkg install -y python-pip    || err "pip install failed"
-  pkg install -y android-tools || warn "android-tools not available — adb needed for phone control"
-  pkg install -y git           || true
-}
+# python-pip is deprecated in newer Termux (pip ships with python); install
+# each package individually so a missing one doesn't abort the rest.
+pkg install -y python        || warn "python install issue"
+pkg install -y android-tools || warn "android-tools not available (needed for adb)"
+pkg install -y git           || true
+# ensure pip is available
+python3 -m pip --version >/dev/null 2>&1 || pkg install -y python-pip || true
 info "System packages ready"
 
 # ---------------------------------------------------------------------------
@@ -82,13 +82,29 @@ echo ""
 echo -e "${C}[2/4] Installing Python dependencies…${B}"
 # On Termux, avoid uvloop / httptools (C extensions that may not build).
 # Use plain uvicorn + websockets.  Pillow has Termux wheels.
-PIP_NO_INPUT=1 pip install --no-cache-dir \
-  "fastapi>=0.103" \
-  "uvicorn>=0.23" \
-  "websockets>=11" \
-  "pillow>=10.0" \
-  2>/dev/null || pip install --no-cache-dir fastapi uvicorn websockets pillow
+DEPS="fastapi>=0.103 uvicorn>=0.23 websockets>=11 pillow>=10.0"
 
+pip_install() {
+  pip install --no-cache-dir "$@"
+}
+
+# Newer Termux (Python 3.11+) marks the env as "externally managed" (PEP 668)
+# and refuses plain `pip install`.  --break-system-packages is the Termux fix.
+if ! pip_install $DEPS 2>&1; then
+  echo -e "${Y}!${B} Plain pip blocked — retrying with --break-system-packages…"
+  if ! pip_install --break-system-packages $DEPS 2>&1; then
+    err "Python dependency install failed. Manual run:"
+    err "  pip install --break-system-packages fastapi uvicorn websockets pillow"
+    exit 1
+  fi
+fi
+
+# verify the imports actually work
+python3 -c "import fastapi, uvicorn, PIL, websockets" 2>/dev/null || {
+  err "Import check failed — one of fastapi/uvicorn/PIL/websockets is missing."
+  err "Try:  pip install --break-system-packages fastapi uvicorn websockets pillow"
+  exit 1
+}
 info "Python dependencies ready"
 
 # ---------------------------------------------------------------------------
