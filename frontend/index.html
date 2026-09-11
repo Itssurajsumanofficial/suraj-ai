@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suraj AI</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <span class="logo-icon">📱</span>
+      <h1>Suraj <span class="accent">AI</span></h1>
+    </div>
+    <div class="header-actions">
+      <button id="connect-btn" class="btn btn-secondary">🔗 Connect</button>
+      <span id="connection-dot" class="dot dot-off" title="Disconnected"></span>
+      <span id="connection-text">No device</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ LEFT: Phone screen ============ -->
+    <section class="panel phone-panel">
+      <div class="panel-header">
+        <h2>📱 Phone Screen</h2>
+        <div class="panel-controls">
+          <button id="mirror-btn" class="btn btn-small">▶ Live Mirror</button>
+          <button id="snapshot-btn" class="btn btn-small">📸 Snapshot</button>
+        </div>
+      </div>
+      <div class="screen-container" id="screen-container">
+        <div class="screen-placeholder" id="screen-placeholder">
+          <div class="placeholder-icon">📲</div>
+          <p>Connect your phone to see the screen</p>
+          <p class="hint">Enable USB debugging or wireless ADB</p>
+        </div>
+        <canvas id="phone-screen" class="hidden"></canvas>
+        <img id="phone-screen-img" class="hidden" alt="Phone screen">
+        <div id="tap-indicator" class="tap-indicator hidden"></div>
+      </div>
+      <!-- Quick actions -->
+      <div class="quick-actions">
+        <button class="btn btn-icon" data-action="home" title="Home">🏠</button>
+        <button class="btn btn-icon" data-action="back" title="Back">↩️</button>
+        <button class="btn btn-icon" data-action="recent" title="Recents">📋</button>
+        <button class="btn btn-icon" data-action="screen_on" title="Wake">🔆</button>
+        <button class="btn btn-icon" data-action="screen_off" title="Sleep">🌙</button>
+        <button class="btn btn-icon" data-action="unlock" title="Unlock">🔓</button>
+        <span class="divider"></span>
+        <button class="btn btn-icon" data-action="volume_up" title="Volume Up">🔊</button>
+        <button class="btn btn-icon" data-action="volume_down" title="Volume Down">🔉</button>
+        <button class="btn btn-icon" data-action="mute" title="Mute">🔇</button>
+        <span class="divider"></span>
+        <button class="btn btn-icon" data-action="screenshot" title="Screenshot">📸</button>
+        <button class="btn btn-icon" data-action="notifications" title="Notifications">🔔</button>
+      </div>
+      <!-- Swipe controls -->
+      <div class="swipe-controls">
+        <button class="btn btn-small" data-swipe="up">↑ Swipe Up</button>
+        <button class="btn btn-small" data-swipe="down">↓ Swipe Down</button>
+        <button class="btn btn-small" data-swipe="left">← Swipe Left</button>
+        <button class="btn btn-small" data-swipe="right">→ Swipe Right</button>
+      </div>
+    </section>
+
+    <!-- ============ CENTER: Chat ============ -->
+    <section class="panel chat-panel">
+      <div class="panel-header">
+        <h2>💬 AI Assistant</h2>
+        <div class="panel-controls">
+          <button id="voice-btn" class="btn btn-small" title="Voice input">🎤</button>
+          <button id="speak-btn" class="btn btn-small" title="Toggle voice output">🔊</button>
+        </div>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="message ai">
+          <div class="message-content">
+            Hi! I'm <strong>Suraj AI</strong> — your personal phone control assistant. I can help you:
+            <ul>
+              <li>📱 Open apps — "open whatsapp"</li>
+              <li>💬 Send texts — "text +1234567890 hello"</li>
+              <li>📞 Make calls — "call +1234567890"</li>
+              <li>📸 Take screenshots — "screenshot"</li>
+              <li>🔔 Read notifications — "notifications"</li>
+              <li>🔍 Multi-step tasks — "send hello to mom on whatsapp"</li>
+            </ul>
+            Connect your phone first, then tell me what to do!
+          </div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="chat-input" placeholder="Type a command or ask me to do something…" autocomplete="off">
+        <button id="send-btn" class="btn btn-primary">Send</button>
+      </div>
+      <!-- Quick commands -->
+      <div class="quick-commands">
+        <button class="chip" data-cmd="screenshot">📸 Screenshot</button>
+        <button class="chip" data-cmd="status">📊 Status</button>
+        <button class="chip" data-cmd="notifications">🔔 Notifications</button>
+        <button class="chip" data-cmd="list apps">📋 List apps</button>
+        <button class="chip" data-cmd="open youtube">▶️ YouTube</button>
+        <button class="chip" data-cmd="open spotify">🎵 Spotify</button>
+      </div>
+    </section>
+
+    <!-- ============ RIGHT: Status + Plan ============ -->
+    <section class="panel info-panel">
+      <div class="panel-header">
+        <h2>📊 Device</h2>
+      </div>
+      <div class="device-info" id="device-info">
+        <div class="info-row"><span class="label">Model</span><span class="value" id="info-model">—</span></div>
+        <div class="info-row"><span class="label">Android</span><span class="value" id="info-android">—</span></div>
+        <div class="info-row"><span class="label">Battery</span><span class="value" id="info-battery">—</span></div>
+        <div class="info-row"><span class="label">Screen</span><span class="value" id="info-screen">—</span></div>
+        <div class="info-row"><span class="label">Resolution</span><span class="value" id="info-res">—</span></div>
+        <div class="info-row"><span class="label">WiFi</span><span class="value" id="info-wifi">—</span></div>
+      </div>
+
+      <div class="panel-header" style="margin-top:1rem">
+        <h2>📋 Plan</h2>
+      </div>
+      <div class="plan-viewer" id="plan-viewer">
+        <p class="hint">Multi-step task steps will appear here</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Connect dialog -->
+  <div class="modal hidden" id="connect-modal">
+    <div class="modal-content">
+      <h3>🔗 Connect to Phone</h3>
+      <p class="hint">Connect via USB (must be plugged in with debugging on) or wireless ADB.</p>
+      <div class="modal-section">
+        <h4>Connected Devices</h4>
+        <div id="device-list" class="device-list">Loading…</div>
+        <div id="device-selector-wrap" class="hidden" style="margin-top:0.5rem">
+          <label style="font-size:0.8rem;color:var(--text-dim)">Active device:</label>
+          <select id="device-selector" class="text-input"></select>
+          <button id="select-device-btn" class="btn btn-small" style="margin-top:0.3rem">Switch</button>
+        </div>
+      </div>
+      <div class="modal-section">
+        <h4>Wireless ADB</h4>
+        <input type="text" id="host-input" placeholder="192.168.1.50:5555" class="text-input">
+        <button id="connect-host-btn" class="btn btn-primary">Connect</button>
+      </div>
+      <div class="modal-section">
+        <h4>Setup Help</h4>
+        <ol class="help-list">
+          <li>Install <a href="https://developer.android.com/tools" target="_blank">platform-tools</a> (includes adb)</li>
+          <li>On phone: Settings → About → tap Build Number 7× → enable Developer Options</li>
+          <li>Settings → Developer Options → enable USB Debugging</li>
+          <li>Plug in via USB (or pair wireless: Developer → Wireless Debugging)</li>
+          <li>Accept the RSA key prompt on your phone</li>
+        </ol>
+      </div>
+      <button id="close-modal" class="btn btn-secondary">Close</button>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

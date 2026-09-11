@@ -1,0 +1,18 @@
+# Suraj AI backend dependencies.
+# The frontend is vanilla HTML/CSS/JS — no build step needed.
+
+# Web framework
+fastapi>=0.103
+uvicorn[standard]>=0.23
+
+# Image handling (screenshots)
+pillow>=10.0
+
+# Optional: LLM-powered planning & screen analysis
+# Install only if you want free-form natural language support:
+#   pip install openai
+openai>=1.0  # optional
+
+# Note: `adb` (Android platform-tools) must be installed on your system
+# and available on PATH.  Install from:
+#   https://developer.android.com/tools

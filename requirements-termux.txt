@@ -1,0 +1,8 @@
+# Suraj AI — Termux dependencies (minimal)
+# Avoids uvloop/httptools/openai C-extension build issues on Android.
+# The rule-based NLU + planner works fully offline without openai.
+
+fastapi>=0.103
+uvicorn>=0.23
+websockets>=11
+pillow>=10.0

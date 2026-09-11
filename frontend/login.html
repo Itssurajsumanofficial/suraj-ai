@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suraj AI — Login</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <style>
+    .login-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: var(--bg);
+    }
+    .login-card {
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      width: 340px;
+      text-align: center;
+    }
+    .login-card .logo-icon { font-size: 3rem; }
+    .login-card h1 { font-size: 1.3rem; margin: 0.5rem 0 0.2rem; }
+    .login-card .hint { margin-bottom: 1.5rem; }
+    .login-card input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.6rem 0.8rem;
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+      margin-bottom: 0.75rem;
+      box-sizing: border-box;
+    }
+    .login-card input:focus { border-color: var(--accent); }
+    .login-card .btn { width: 100%; justify-content: center; }
+    .login-error {
+      color: var(--red);
+      font-size: 0.82rem;
+      margin-bottom: 0.75rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="logo-icon">📱</div>
+      <h1>Suraj <span class="accent">AI</span></h1>
+      <p class="hint">Enter password to access your phone</p>
+      <div class="login-error" id="err">Wrong password. Try again.</div>
+      <form id="login-form">
+        <input type="password" id="pw" placeholder="Password" autofocus>
+        <button type="submit" class="btn btn-primary">Unlock</button>
+      </form>
+    </div>
+  </div>
+  <script>
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const pw = document.getElementById("pw").value;
+      const res = await fetch("/api/login?password=" + encodeURIComponent(pw), { method: "POST" });
+      if (res.ok) {
+        window.location.href = "/";
+      } else {
+        document.getElementById("err").style.display = "block";
+        document.getElementById("pw").value = "";
+        document.getElementById("pw").focus();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+# ===================================================================
+#  Suraj AI — Docker Compose
+#  Start:  docker compose up -d
+#  Logs:   docker compose logs -f
+#  Stop:   docker compose down
+# ===================================================================
+
+services:
+  suraj-ai:
+    build: .
+    container_name: suraj-ai
+    ports:
+      - "8000:8000"
+    # USB phones: uncomment these to pass through the USB bus
+    # privileged: true
+    # volumes:
+    #   - /dev/bus/usb:/dev/bus/usb
+    environment:
+      # ---- Set a password to protect access (recommended) ----
+      - SURAJ_PASSWORD=${SURAJ_PASSWORD:-}
+      # ---- LLM (optional, for free-form NLU) ----
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - LLM_BASE_URL=${LLM_BASE_URL:-}
+      - LLM_MODEL=${LLM_MODEL:-}
+    restart: unless-stopped
+    # For wireless ADB phones, use host network so the container can
+    # reach devices on your WiFi:
+    # network_mode: host
