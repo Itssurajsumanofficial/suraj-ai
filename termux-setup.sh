@@ -42,6 +42,19 @@ banner
 # ---------------------------------------------------------------------------
 if [ "${1:-}" = "--start" ]; then
   info "Starting server only…"
+  # Self-heal: if any core dep is missing, install it before launching.
+  if ! python3 -c "import fastapi, uvicorn, PIL, websockets" 2>/dev/null; then
+    warn "Some Python deps missing — installing them now…"
+    DEPS="fastapi==0.99.1 pydantic<2 uvicorn>=0.23 websockets>=11 pillow>=10.0"
+    pip install --no-cache-dir $DEPS 2>/dev/null \
+      || pip install --no-cache-dir --break-system-packages $DEPS 2>&1 \
+      || { err "Install failed. Run manually:"; \
+           err "  pip install --break-system-packages fastapi uvicorn websockets pillow"; \
+           exit 1; }
+    python3 -c "import fastapi, uvicorn, PIL, websockets" 2>/dev/null \
+      || { err "Still missing deps. Run: pip install --break-system-packages fastapi uvicorn websockets pillow"; exit 1; }
+    info "Dependencies installed."
+  fi
   export SURAJ_NO_RELOAD=1
   exec python3 server.py
 fi
@@ -81,8 +94,10 @@ info "System packages ready"
 echo ""
 echo -e "${C}[2/4] Installing Python dependencies…${B}"
 # On Termux, avoid uvloop / httptools (C extensions that may not build).
-# Use plain uvicorn + websockets.  Pillow has Termux wheels.
-DEPS="fastapi>=0.103 uvicorn>=0.23 websockets>=11 pillow>=10.0"
+# CRITICAL: pin FastAPI 0.99.x + pydantic<2 (pure Python).  FastAPI 0.100+
+# pulls pydantic v2 → pydantic-core (Rust, no Android wheel → long build).
+# Our code uses pydantic indirectly only, so 0.99.1 is fully compatible.
+DEPS="fastapi==0.99.1 pydantic<2 uvicorn>=0.23 websockets>=11 pillow>=10.0"
 
 pip_install() {
   pip install --no-cache-dir "$@"

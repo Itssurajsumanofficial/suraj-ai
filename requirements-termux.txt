@@ -1,8 +1,12 @@
-# Suraj AI — Termux dependencies (minimal)
-# Avoids uvloop/httptools/openai C-extension build issues on Android.
-# The rule-based NLU + planner works fully offline without openai.
+# Suraj AI — Termux dependencies (minimal, no Rust toolchain needed)
+#
+# FastAPI 0.99.x is the LAST version using pydantic v1 (pure Python).
+# FastAPI 0.100+ pulls pydantic v2 → pydantic-core (Rust, no Android wheel,
+# forces a long source build).  Our code uses pydantic indirectly only,
+# so pinning to 0.99.1 lets everything install instantly on Termux.
 
-fastapi>=0.103
+fastapi==0.99.1
+pydantic<2
 uvicorn>=0.23
 websockets>=11
 pillow>=10.0
